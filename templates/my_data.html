@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Mes données personnelles{% endblock %}
+{% block content %}
+<div class="container" style="max-width:800px">
+  <div class="page-header">
+    <h1 class="page-title">🔐 Mes données personnelles</h1>
+    <p class="page-sub">Exercice de vos droits RGPD — Arts. 15, 17, 20</p>
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="alerts">{% for cat, msg in messages %}<div class="alert alert-{{ cat }}">{{ msg }}</div>{% endfor %}</div>
+  {% endif %}
+  {% endwith %}
+
+  <div class="rgpd-banner">
+    🔒 Conformément au RGPD et à la loi marocaine 09-08, vous disposez d'un droit d'accès, de rectification,
+    d'effacement et de portabilité de vos données personnelles.
+  </div>
+
+  <!-- Droit d'accès Art. 15 -->
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-header">
+      <span class="card-title">📋 Droit d'accès (Art. 15)</span>
+      <span class="badge badge-blue">Données collectées</span>
+    </div>
+    <table style="margin-bottom:0">
+      <tbody>
+        <tr><td style="color:var(--text2);width:200px">Identifiant</td><td>{{ user['username'] }}</td></tr>
+        <tr><td style="color:var(--text2)">Profil</td><td><span class="badge badge-gray">{{ user['role'] }}</span></td></tr>
+        <tr><td style="color:var(--text2)">Compte créé le</td><td>{{ user['created_at'][:16] }}</td></tr>
+        <tr><td style="color:var(--text2)">Nombre de requêtes</td><td>{{ requests|length }}</td></tr>
+        <tr><td style="color:var(--text2)">Données conservées</td><td>Texte des demandes + réponses (6 mois)</td></tr>
+        <tr><td style="color:var(--text2)">Responsable de traitement</td><td>ENSA Béni Mellal — Direction</td></tr>
+        <tr><td style="color:var(--text2)">Contact DPO</td><td>dpo@ensa-bm.ac.ma</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Droit à la portabilité Art. 20 -->
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-header">
+      <span class="card-title">📥 Droit à la portabilité (Art. 20)</span>
+    </div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:16px">
+      Exportez l'ensemble de vos données dans un format lisible par machine (JSON).
+    </p>
+    <a href="{{ url_for('export_data') }}" class="btn btn-primary">⬇️ Exporter mes données (JSON)</a>
+  </div>
+
+  <!-- Droit à l'effacement Art. 17 -->
+  <div class="card" id="delete" style="border-color:var(--red)">
+    <div class="card-header">
+      <span class="card-title" style="color:var(--red)">🗑️ Droit à l'effacement (Art. 17)</span>
+      <span class="badge badge-red">Action irréversible</span>
+    </div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:16px">
+      Supprimez définitivement tout votre historique de requêtes. Cette action est irréversible.
+      Votre compte est conservé, seules les requêtes sont supprimées.
+    </p>
+    {% if requests %}
+    <form method="POST" action="{{ url_for('delete_all_data') }}"
+          onsubmit="return confirm('Supprimer TOUT votre historique ({{ requests|length }} requêtes) ? Action irréversible.')">
+      <button type="submit" class="btn btn-danger">🗑️ Supprimer tout mon historique ({{ requests|length }} requêtes)</button>
+    </form>
+    {% else %}
+    <p style="font-size:13px;color:var(--text3)">Aucun historique à supprimer.</p>
+    {% endif %}
+  </div>
+
+  <!-- Autres droits -->
+  <div class="card" style="margin-top:16px">
+    <div class="card-header">
+      <span class="card-title">📬 Autres droits</span>
+    </div>
+    <p style="font-size:13px;color:var(--text2);line-height:1.8">
+      Pour exercer vos droits de <strong>rectification</strong> (Art. 16),
+      <strong>opposition</strong> (Art. 21) ou <strong>limitation</strong> (Art. 18),
+      contactez le Délégué à la Protection des Données :
+      <br><br>
+      📧 <strong>dpo@ensa-bm.ac.ma</strong><br>
+      Délai de réponse : <strong>1 mois maximum</strong> à compter de la réception de votre demande.
+    </p>
+  </div>
+</div>
+{% endblock %}

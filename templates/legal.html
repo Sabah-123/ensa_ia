@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Mentions légales{% endblock %}
+{% block content %}
+<div class="container" style="max-width:800px">
+  <div class="page-header">
+    <h1 class="page-title">Mentions légales & Information RGPD</h1>
+    <p class="page-sub">Conformément au RGPD (UE 2016/679) et à la loi marocaine 09-08</p>
+  </div>
+  <div class="card">
+    <div style="line-height:1.9;font-size:14px;color:var(--text2)">
+      <h3 style="color:var(--text);margin-bottom:8px">1. Responsable de traitement</h3>
+      <p>École Nationale des Sciences Appliquées (ENSA) de Béni Mellal — Université Sultan Moulay Slimane.</p>
+      <p>Contact DPO : <strong>dpo@ensa-bm.ac.ma</strong></p>
+      <div class="divider"></div>
+      <h3 style="color:var(--text);margin-bottom:8px">2. Données collectées</h3>
+      <p>Ce système collecte : identifiant utilisateur pseudonymisé, texte des demandes soumises, réponses générées, horodatages, adresses IP. <strong>Aucune donnée sensible au sens de l'Art. 9 RGPD n'est collectée.</strong></p>
+      <div class="divider"></div>
+      <h3 style="color:var(--text);margin-bottom:8px">3. Finalité du traitement</h3>
+      <p>Assistance pédagogique, génération de contenus académiques, amélioration des services éducatifs de l'ENSA. Base légale : mission d'intérêt public (Art. 6.1.e RGPD).</p>
+      <div class="divider"></div>
+      <h3 style="color:var(--text);margin-bottom:8px">4. Durées de conservation</h3>
+      <p>Historique des requêtes : <strong>6 mois</strong>. Journaux d'audit : <strong>12 mois</strong>. Données de compte : durée de la scolarité / du contrat.</p>
+      <div class="divider"></div>
+      <h3 style="color:var(--text);margin-bottom:8px">5. Droits des personnes</h3>
+      <p>Conformément au RGPD, vous disposez des droits d'accès (Art. 15), de rectification (Art. 16), d'effacement (Art. 17), de limitation (Art. 18), de portabilité (Art. 20) et d'opposition (Art. 21). Pour les exercer : <strong>dpo@ensa-bm.ac.ma</strong></p>
+      <div class="divider"></div>
+      <h3 style="color:var(--text);margin-bottom:8px">6. Décisions automatisées</h3>
+      <p><strong>Ce système ne prend aucune décision administrative automatisée</strong> (Art. 22 RGPD). Toute réponse de l'IA nécessite une validation humaine avant toute application.</p>
+      <div class="divider"></div>
+      <h3 style="color:var(--text);margin-bottom:8px">7. Sécurité</h3>
+      <p>Chiffrement HTTPS/TLS, authentification par mot de passe haché (bcrypt), journalisation des accès, contrôle d'accès basé sur les rôles (RBAC).</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

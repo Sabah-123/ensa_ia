@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Historique{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-end">
+    <div>
+      <h1 class="page-title">Historique des requêtes</h1>
+      <p class="page-sub">{{ total }} requête(s) — Conservation 6 mois (RGPD Art. 5)</p>
+    </div>
+    <a href="{{ url_for('ask') }}" class="btn btn-primary">+ Nouvelle requête</a>
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="alerts">{% for cat, msg in messages %}<div class="alert alert-{{ cat }}">{{ msg }}</div>{% endfor %}</div>
+  {% endif %}
+  {% endwith %}
+
+  <div class="card">
+    {% if rows %}
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Question</th>
+            <th>Modèle IA</th>
+            <th>Date</th>
+            <th>Statut</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in rows %}
+          <tr>
+            <td style="color:var(--text3)">{{ row['id'] }}</td>
+            <td>
+              <a href="{{ url_for('history_detail', req_id=row['id']) }}" style="color:var(--blue);text-decoration:none">
+                {{ row['prompt_preview'][:70] }}{% if row['prompt_preview']|length > 70 %}…{% endif %}
+              </a>
+            </td>
+            <td><span class="badge badge-gray">{{ row['model_used'] }}</span></td>
+            <td style="color:var(--text3);font-size:11px;white-space:nowrap">{{ row['created_at'][:16] }}</td>
+            <td>
+              {% if row['is_flagged'] %}
+              <span class="badge badge-yellow">⚠ Signalée</span>
+              {% else %}
+              <span class="badge badge-green">✓ OK</span>
+              {% endif %}
+            </td>
+            <td>
+              <div style="display:flex;gap:4px">
+                <a href="{{ url_for('history_detail', req_id=row['id']) }}" class="btn btn-ghost btn-sm">Voir</a>
+                <form method="POST" action="{{ url_for('delete_request', req_id=row['id']) }}" onsubmit="return confirm('Supprimer cette requête ?')">
+                  <button type="submit" class="btn btn-danger btn-sm">🗑</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% if total_pages > 1 %}
+    <div class="pagination">
+      <a href="?page={{ page-1 }}" class="page-link {% if page==1 %}disabled{% endif %}">‹ Préc.</a>
+      {% for p in range(1, total_pages+1) %}
+      <a href="?page={{ p }}" class="page-link {% if p==page %}active{% endif %}">{{ p }}</a>
+      {% endfor %}
+      <a href="?page={{ page+1 }}" class="page-link {% if page==total_pages %}disabled{% endif %}">Suiv. ›</a>
+    </div>
+    {% endif %}
+    {% else %}
+    <div class="empty-state">
+      <div class="icon">📂</div>
+      <p>Aucune requête dans l'historique.</p>
+      <a href="{{ url_for('ask') }}" class="btn btn-primary" style="margin-top:12px">Faire une première requête</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

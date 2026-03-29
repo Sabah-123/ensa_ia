@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}Nouvelle requête{% endblock %}
+{% block content %}
+<div class="container" style="max-width:800px">
+  <div class="page-header">
+    <h1 class="page-title">Nouvelle requête IA</h1>
+    <p class="page-sub">Posez une question ou soumettez un texte à résumer — Validation humaine recommandée</p>
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="alerts">
+    {% for cat, msg in messages %}
+    <div class="alert alert-{{ cat }}">{{ msg }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% endwith %}
+
+  {% if warned and warning_msg %}
+  <div class="alert alert-warning" style="margin-bottom:20px">
+    ⚠️ {{ warning_msg }}
+  </div>
+  {% endif %}
+
+  <div class="ia-notice">
+    ⚠️ <strong>Transparence IA (RGPD Art. 13)</strong> — Les réponses sont générées par intelligence artificielle.
+    Elles peuvent contenir des erreurs (hallucinations). Ne saisissez jamais de données personnelles.
+    Toute requête est journalisée conformément à la politique RGPD.
+  </div>
+
+  <div class="card">
+    <form method="POST" id="ask-form">
+      <div class="form-group">
+        <label class="form-label">Votre question ou texte à traiter</label>
+        <textarea
+          name="prompt"
+          class="form-control"
+          maxlength="2000"
+          placeholder="Ex : Explique le principe de la cryptographie asymétrique...
+Ex : Résume ce texte : [collez votre texte ici]
+Ex : Quelles sont les étapes d'un audit de sécurité ?"
+          rows="7"
+          required
+        >{{ prompt or '' }}</textarea>
+        <div class="char-counter">0 / 2000 caractères</div>
+        <div class="form-hint">
+          🚫 Interdit : noms complets, emails, téléphones, mots de passe, numéros CIN, données de santé.
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <button type="submit" class="btn btn-primary" id="submit-btn">
+          <span id="btn-text">⚡ Générer la réponse</span>
+        </button>
+        <button type="reset" class="btn btn-ghost">Effacer</button>
+        <span style="font-size:11px;color:var(--text3);margin-left:auto">Quota : 30 requêtes / heure</span>
+      </div>
+    </form>
+  </div>
+
+  {% if response %}
+  <div class="card" style="margin-top:24px">
+    <div class="card-header">
+      <span class="card-title">Réponse générée</span>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span class="badge badge-gray">🤖 {{ model_used }}</span>
+        {% if warned %}
+        <span class="badge badge-yellow">⚠ Contenu signalé</span>
+        {% else %}
+        <span class="badge badge-green">✓ Conforme</span>
+        {% endif %}
+      </div>
+    </div>
+    <div class="response-meta">
+      <span>Question : <em>{{ prompt[:80] }}{% if prompt|length > 80 %}…{% endif %}</em></span>
+    </div>
+    <div class="response-box">
+      <div class="response-content">{{ response }}</div>
+    </div>
+    <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border);display:flex;gap:8px">
+      <a href="{{ url_for('ask') }}" class="btn btn-ghost btn-sm">+ Nouvelle question</a>
+      <a href="{{ url_for('history') }}" class="btn btn-ghost btn-sm">Voir l'historique</a>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('ask-form').addEventListener('submit', function() {
+  const btn = document.getElementById('submit-btn');
+  const txt = document.getElementById('btn-text');
+  btn.disabled = true;
+  txt.textContent = '⏳ Génération en cours…';
+});
+</script>
+{% endblock %}

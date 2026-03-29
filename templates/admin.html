@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}Administration{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-end">
+    <div>
+      <h1 class="page-title">Tableau de bord Administrateur</h1>
+      <p class="page-sub">Supervision humaine — Conformité RGPD Art. 22</p>
+    </div>
+    <a href="{{ url_for('admin_users') }}" class="btn btn-ghost">Gestion utilisateurs</a>
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="alerts">{% for cat, msg in messages %}<div class="alert alert-{{ cat }}">{{ msg }}</div>{% endfor %}</div>
+  {% endif %}
+  {% endwith %}
+
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-value" style="color:var(--blue)">{{ users_count }}</div><div class="stat-label">Utilisateurs inscrits</div></div>
+    <div class="stat-card"><div class="stat-value" style="color:var(--green)">{{ requests_count }}</div><div class="stat-label">Requêtes totales</div></div>
+    <div class="stat-card"><div class="stat-value" style="color:var(--yellow)">{{ flagged_count }}</div><div class="stat-label">En attente de décision</div></div>
+    <div class="stat-card"><div class="stat-value" style="color:var(--green)">Actif</div><div class="stat-label">Supervision humaine</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">Requêtes signalées — Action requise (RGPD Art. 22)</span>
+      <span class="badge badge-yellow">{{ flagged_count }} sans décision</span>
+    </div>
+
+    {% if recent_flags %}
+    {% for row in recent_flags %}
+    <div style="border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;background:var(--bg3)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="badge badge-blue">{{ row['username'] }}</span>
+          <span style="font-size:11px;color:var(--text3)">Requête #{{ row['id'] }} — {{ row['created_at'][:16] }}</span>
+          {% if row['admin_action'] %}
+            {% if row['admin_action'] == 'valide' %}<span class="badge badge-green">Validée</span>
+            {% elif row['admin_action'] == 'averti' %}<span class="badge badge-yellow">Utilisateur averti</span>
+            {% elif row['admin_action'] == 'bloque' %}<span class="badge badge-red">Utilisateur bloqué</span>
+            {% endif %}
+          {% else %}
+          <span class="badge badge-yellow">En attente</span>
+          {% endif %}
+        </div>
+        <span style="font-size:11px;color:var(--yellow)">{{ row['flag_reason'] or 'Contenu sensible' }}</span>
+      </div>
+
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:10px;margin-bottom:8px;font-size:12px;color:var(--text2)">
+        <strong style="color:var(--text3)">Question :</strong> {{ row['prompt_preview'] }}
+      </div>
+      {% if row['response_preview'] %}
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:10px;margin-bottom:12px;font-size:12px;color:var(--text2)">
+        <strong style="color:var(--text3)">Réponse IA :</strong> {{ row['response_preview'][:150] }}{% if row['response_preview']|length > 150 %}...{% endif %}
+      </div>
+      {% endif %}
+
+      {% if row['admin_note'] %}
+      <div style="background:var(--green-bg);border:1px solid var(--green);border-radius:var(--radius);padding:8px;margin-bottom:10px;font-size:12px;color:var(--green)">
+        Note admin : {{ row['admin_note'] }}
+      </div>
+      {% endif %}
+
+      {% if not row['admin_action'] %}
+      <form method="POST" action="{{ url_for('admin_action', req_id=row['id']) }}">
+        <div style="margin-bottom:8px">
+          <input type="text" name="note" class="form-control" placeholder="Note de l'administrateur (optionnel)..." style="font-size:12px;padding:6px 10px">
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button type="submit" name="action" value="valider"
+            class="btn btn-ghost btn-sm" style="color:var(--green);border-color:var(--green)"
+            onclick="return confirm('Valider cette requete ?')">
+            Valider le contenu
+          </button>
+          <button type="submit" name="action" value="avertir_utilisateur"
+            class="btn btn-ghost btn-sm" style="color:var(--yellow);border-color:var(--yellow)"
+            onclick="return confirm('Avertir cet utilisateur ?')">
+            Avertir l'utilisateur
+          </button>
+          <button type="submit" name="action" value="supprimer"
+            class="btn btn-ghost btn-sm" style="color:var(--red);border-color:var(--red)"
+            onclick="return confirm('Supprimer cette requete ?')">
+            Supprimer
+          </button>
+          <button type="submit" name="action" value="bloquer_utilisateur"
+            class="btn btn-danger btn-sm"
+            onclick="return confirm('Bloquer ce compte ? Acces suspendu immediatement.')">
+            Bloquer le compte
+          </button>
+        </div>
+      </form>
+      {% endif %}
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="empty-state">
+      <div class="icon" style="font-size:36px">OK</div>
+      <p>Aucune requête signalée en attente de décision.</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="card" style="margin-top:20px">
+    <div class="card-header"><span class="card-title">Journal d'audit</span></div>
+    <p style="font-size:13px;color:var(--text2)">
+      Toutes les actions admin sont enregistrées dans <code>audit.log</code>.
+      Format : <code>TIMESTAMP | ACTION | USER | IP | DETAIL</code>
+    </p>
+  </div>
+</div>
+{% endblock %}

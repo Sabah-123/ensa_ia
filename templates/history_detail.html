@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Détail requête #{{ row['id'] }}{% endblock %}
+{% block content %}
+<div class="container" style="max-width:800px">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+    <a href="{{ url_for('history') }}" class="btn btn-ghost btn-sm">← Retour</a>
+    <h1 class="page-title" style="margin:0">Requête #{{ row['id'] }}</h1>
+    {% if row['is_flagged'] %}
+    <span class="badge badge-yellow">⚠ Signalée</span>
+    {% else %}
+    <span class="badge badge-green">✓ Conforme</span>
+    {% endif %}
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-header">
+      <span class="card-title">Question posée</span>
+      <div style="display:flex;gap:8px">
+        <span class="badge badge-gray">{{ row['created_at'][:16] }}</span>
+        <span class="badge badge-blue">{{ row['model_used'] }}</span>
+      </div>
+    </div>
+    <div style="background:var(--bg3);padding:16px;border-radius:var(--radius);font-size:14px;line-height:1.7">
+      {{ row['prompt_full'] or row['prompt_preview'] }}
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-header">
+      <span class="card-title">Réponse générée</span>
+      <span style="font-size:11px;color:var(--text3)">⚠️ Validation humaine recommandée</span>
+    </div>
+    <div class="response-box">
+      <div class="response-content">{{ row['response_full'] or row['response_preview'] }}</div>
+    </div>
+  </div>
+
+  {% if row['flag_reason'] %}
+  <div class="alert alert-warning">⚠️ Raison du signalement : {{ row['flag_reason'] }}</div>
+  {% endif %}
+
+  <div style="display:flex;gap:8px;margin-top:16px">
+    <a href="{{ url_for('ask') }}" class="btn btn-primary">+ Nouvelle question</a>
+    <form method="POST" action="{{ url_for('delete_request', req_id=row['id']) }}" onsubmit="return confirm('Supprimer cette requête ? (RGPD Art. 17)')">
+      <button type="submit" class="btn btn-danger">🗑️ Supprimer (Art. 17)</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

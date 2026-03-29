@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Gestion utilisateurs{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-end">
+    <div>
+      <h1 class="page-title">Gestion des utilisateurs</h1>
+      <p class="page-sub">{{ users|length }} comptes enregistrés</p>
+    </div>
+    <a href="{{ url_for('admin') }}" class="btn btn-ghost">Retour admin</a>
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="alerts">{% for cat, msg in messages %}<div class="alert alert-{{ cat }}">{{ msg }}</div>{% endfor %}</div>
+  {% endif %}
+  {% endwith %}
+
+  <div class="card">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Identifiant</th>
+            <th>Rôle</th>
+            <th>Requêtes</th>
+            <th>Signalées</th>
+            <th>Statut</th>
+            <th>Inscrit le</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in users %}
+          <tr>
+            <td style="color:var(--text3)">{{ u['id'] }}</td>
+            <td>
+              <strong style="color:var(--text)">{{ u['username'] }}</strong>
+              {% if u['blocked_reason'] %}
+              <div style="font-size:10px;color:var(--red);margin-top:2px">{{ u['blocked_reason'][:40] }}</div>
+              {% endif %}
+            </td>
+            <td><span class="badge badge-{% if u['role']=='admin' %}red{% elif u['role']=='personnel' %}blue{% else %}gray{% endif %}">{{ u['role'] }}</span></td>
+            <td style="text-align:center">{{ u['req_count'] or 0 }}</td>
+            <td style="text-align:center">
+              {% if u['flag_count'] and u['flag_count'] > 0 %}
+              <span class="badge badge-yellow">{{ u['flag_count'] }}</span>
+              {% else %}
+              <span style="color:var(--text3)">0</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if u['is_blocked'] %}
+              <span class="badge badge-red">Bloque</span>
+              {% else %}
+              <span class="badge badge-green">Actif</span>
+              {% endif %}
+            </td>
+            <td style="color:var(--text3);font-size:11px">{{ u['created_at'][:10] }}</td>
+            <td>
+              {% if u['is_blocked'] %}
+              <form method="POST" action="{{ url_for('admin_unblock', user_id=u['id']) }}" style="display:inline">
+                <button type="submit" class="btn btn-ghost btn-sm" style="color:var(--green);border-color:var(--green)"
+                  onclick="return confirm('Reactiver ce compte ?')">Reactiver</button>
+              </form>
+              {% elif u['role'] != 'admin' %}
+              <span style="color:var(--text3);font-size:11px">—</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

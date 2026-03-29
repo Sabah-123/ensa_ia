@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Connexion{% endblock %}
+{% block content %}
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-logo">IA</div>
+    <h1 class="auth-title">Connexion</h1>
+    <p class="auth-sub">Système IA Responsable — ENSA Béni Mellal</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="alerts">
+      {% for cat, msg in messages %}
+      <div class="alert alert-{{ cat }}">⚡ {{ msg }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <div class="ia-notice">
+      ⚠️ Ce système utilise l'intelligence artificielle. Toute utilisation est journalisée conformément au RGPD.
+    </div>
+
+    <form method="POST">
+      <div class="form-group">
+        <label class="form-label">Identifiant</label>
+        <input type="text" name="username" class="form-control" placeholder="Votre identifiant ENSA" required autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Mot de passe</label>
+        <input type="password" name="password" class="form-control" placeholder="••••••••" required autocomplete="current-password">
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Se connecter</button>
+    </form>
+
+    <div class="auth-footer">
+      Pas encore de compte ? <a href="{{ url_for('register') }}">Créer un compte</a>
+      <br><br>
+      <a href="{{ url_for('legal') }}">Mentions légales</a> · <a href="{{ url_for('politique') }}">Politique d'utilisation</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
