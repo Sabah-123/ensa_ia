@@ -1,11 +1,6 @@
 # Système IA Responsable — ENSA Béni Mellal
 ### Assistant Pédagogique Intelligent & Conforme RGPD / Loi 09-08
 
-**Projet pédagogique** — Module Éthique et Droit du Numérique  
-**Filière :** Intelligence Artificielle et Cybersécurité (IACS)  
-**Encadrant :** Pr. TOUIL  
-**Établissement :** ENSA Béni Mellal — Université Sultan Moulay Slimane  
-
 ---
 
 ## Description du Projet
@@ -13,14 +8,6 @@
 Ce système est une **application web d'assistance pédagogique par intelligence artificielle**, conçue et développée dans le cadre du module Éthique et Droit du Numérique (EDN) de la filière IACS à l'ENSA de Béni Mellal.
 
 L'objectif est de démontrer qu'il est possible de déployer un système IA utile tout en respectant rigoureusement les principes du RGPD, la loi marocaine 09-08 sur la protection des données personnelles, et les exigences éthiques de gouvernance IA.
-
-### Ce que fait l'application
-
-L'application permet aux étudiants et au personnel de l'ENSA de :
-- Poser des questions académiques et obtenir des réponses générées par IA (Llama 3.1 via Groq)
-- Soumettre des textes à résumer ou analyser
-- Consulter l'historique de leurs requêtes
-- Exercer leurs droits RGPD directement depuis l'interface
 
 ### Ce qui la distingue
 
@@ -54,87 +41,6 @@ ensa_ia/
     ├── legal.html          # Mentions légales et information RGPD
     └── politique.html      # Politique d'utilisation du système
 ```
-
----
-
-## Fonctionnalités Détaillées
-
-### 1. Intelligence Artificielle
-- **Modèle** : Llama 3.1 8B Instant via l'API Groq (gratuit)
-- **Connaissance spécialisée** : l'assistant connaît l'ENSA-BM, ses 4 filières (G2ER, IAA, IACS, TDI), les coordinateurs, le cycle préparatoire et le module EDN
-- **Fallback local** : si l'API est indisponible, un assistant local répond aux questions sur l'ENSA-BM
-- **Disclaimer obligatoire** : chaque réponse IA inclut un avertissement de vérification humaine (RGPD Art. 13)
-
-### 2. Conformité RGPD — Filtre de données personnelles
-Le module `compliance.py` analyse chaque requête avant l'envoi à l'IA :
-
-**Données bloquées (requête refusée) :**
-- Adresses email (regex)
-- Numéros de téléphone marocains (+212, 06xx, 07xx)
-- Numéros CIN marocains (A-Z + chiffres)
-- Numéros de carte bancaire
-- Mots de passe apparents
-- Coordonnées GPS
-- Noms et prénoms complets (Prénom NOM)
-
-**Données signalées (requête passée, admin alerté) :**
-- Données sensibles (santé, religion, origine ethnique, judiciaire)
-- Adresses physiques
-- Dates de naissance
-
-### 3. Authentification et Sécurité
-- Mots de passe hachés avec **PBKDF2-SHA256** (600 000 itérations) via Werkzeug
-- Sessions sécurisées avec cookie HttpOnly et SameSite
-- Sessions expirées après 2 heures d'inactivité
-- Vérification du statut du compte à chaque connexion (comptes bloqués refusés)
-- Rate limiting : 30 requêtes maximum par heure et par utilisateur
-
-### 4. Journalisation d'Audit (RGPD Art. 5 — Accountability)
-Toutes les actions sont enregistrées dans `audit.log` :
-
-| Action | Déclencheur |
-|--------|-------------|
-| LOGIN_SUCCESS | Connexion réussie |
-| LOGIN_FAILED | Tentative échouée |
-| LOGIN_BLOCKED | Compte suspendu tente de se connecter |
-| LOGOUT | Déconnexion |
-| REGISTER | Création de compte |
-| ASK | Requête IA soumise |
-| COMPLIANCE_BLOCK | Données personnelles détectées et bloquées |
-| HISTORY_VIEW | Consultation de l'historique |
-| RGPD_ACCESS_REQUEST | Accès à "Mes données" |
-| RGPD_EXPORT | Export JSON des données |
-| RGPD_DELETE_ALL | Effacement complet de l'historique |
-| ADMIN_VIEW | Accès panneau admin |
-| ADMIN_VALIDATE | Admin valide une requête signalée |
-| ADMIN_WARN_USER | Admin envoie un avertissement |
-| ADMIN_DELETE | Admin supprime une requête |
-| ADMIN_BLOCK_USER | Admin suspend un compte |
-| ADMIN_UNBLOCK | Admin réactive un compte |
-| RATE_LIMIT | Quota horaire atteint |
-
-### 5. Droits RGPD (Articles 15, 17, 20, 22)
-Disponibles dans `/my-data` :
-- **Art. 15 — Droit d'accès** : tableau complet des données collectées, finalités, durées de conservation, contact DPO
-- **Art. 20 — Portabilité** : export de l'historique au format JSON téléchargeable
-- **Art. 17 — Effacement** : suppression définitive et immédiate de tout l'historique
-- **Art. 22 — Décision non automatisée** : aucune décision administrative n'est prise par l'IA — validation humaine systématique
-
-### 6. Supervision Humaine — Panneau Admin
-L'administrateur accède à `/admin` et peut agir sur chaque requête signalée :
-- **Valider** : contenu jugé acceptable, flag archivé
-- **Avertir l'utilisateur** : avertissement formel enregistré dans la table `warnings`
-- **Supprimer** : effacement définitif de la requête
-- **Bloquer le compte** : suspension immédiate de l'accès
-
-Depuis `/admin/users`, l'admin voit tous les utilisateurs avec leur nombre de requêtes, de signalements, et peut réactiver les comptes bloqués.
-
-### 7. Conservation des données (RGPD Art. 5.1.e)
-- Historique des requêtes : **6 mois** (purge automatique)
-- Journaux d'audit : **12 mois**
-- Données de compte : durée de la scolarité ou du contrat
-
----
 
 ## Installation et Lancement
 
@@ -208,7 +114,7 @@ Pour créer un compte étudiant ou personnel : `/register`
 | Question à soumettre | Résultat attendu |
 |---------------------|------------------|
 | `Présente l'ENSA de Béni Mellal` | 4 filières + coordinateurs |
-| `C'est quoi la filière IACS ?` | Pr. GOUSKIR + IA/Cybersécurité |
+| `C'est quoi la filière IACS ?` |  IA/Cybersécurité |
 | `Explique le machine learning` | Réponse complète via Groq |
 | `Mon email est test@gmail.com` | Bloqué — données personnelles |
 | `Parle des maladies cardiaques` | Signalé dans /admin |
@@ -245,22 +151,3 @@ Pour créer un compte étudiant ou personnel : `/register`
 | Configuration | python-dotenv | Séparation code/configuration |
 
 Toutes les technologies utilisées sont **open source**, conformément aux exigences du projet.
-
----
-
-## Informations sur l'ENSA-BM
-
-| Filière | Coordinateur | Spécialité |
-|---------|--------------|------------|
-| G2ER | Pr. OULCAID MOSTAPHA | Génie Électrique & Énergies Renouvelables |
-| IAA | Pr. ROKNI YAHYA | Industries Agroalimentaires |
-| IACS | Pr. GOUSKIR MOHAMED | Intelligence Artificielle & Cybersécurité |
-| TDI | Pr. OUANAN HAMID | Transformation Digitale Industrielle |
-
-Cycle Préparatoire : Pr. KAAB MOHAMED — 200 places — Concours national
-
----
-
-*ENSA Béni Mellal — Université Sultan Moulay Slimane*  
-*Module EDN — Éthique et Droit du Numérique — Pr. TOUIL*  
-*Filière IACS — Année universitaire 2024–2025*
